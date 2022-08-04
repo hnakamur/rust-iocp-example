@@ -144,7 +144,7 @@ fn main() {
             ffi::GetQueuedCompletionStatusEx(
                 queue,
                 events.as_mut_ptr(),
-                events.capacity() as u32,
+                1,
                 &mut entries_removed,
                 ffi::INFINITE,
                 false,
