@@ -144,13 +144,13 @@ fn main() {
             ffi::GetQueuedCompletionStatusEx(
                 queue,
                 events.as_mut_ptr(),
-                1,
+                events.capacity() as u32,
                 &mut entries_removed,
                 ffi::INFINITE,
                 false,
             )
         };
-        println!("after GetQueuedCompletionStatusEx: res={}, events.len={}", res, events.len());
+        println!("after GetQueuedCompletionStatusEx: res={}, events.len={}, entries_removed={}", res, events.len(), entries_removed);
 
         if res == 0 {
             panic!("{}", io::Error::last_os_error());
@@ -159,7 +159,7 @@ fn main() {
         // This one unsafe we could avoid though but this technique is used
         // in libraries like `mio` and is safe as long as the OS does
         // what it's supposed to.
-        unsafe { events.set_len(res as usize) };
+        unsafe { events.set_len(entries_removed as usize) };
 
         for event in events {
             let operation = unsafe { &*(event.lp_overlapped as *const Operation) };
